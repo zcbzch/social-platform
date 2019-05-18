@@ -17,7 +17,7 @@
                 <div class="bottom">
                     <div class="word">现在就加入shine暮里</div>
                     <el-button type="primary" round>注册</el-button>
-                    <el-button style="border: 1px solid #409EFF" round @click="() => {this.dialog.login.show = true}">登录</el-button>
+                    <el-button style="border: 1px solid #409EFF" round @click="$_openDialogLogin">登录</el-button>
                 </div>
                 
             </div>
@@ -63,7 +63,17 @@ export default {
         }
     },
     methods: {
+        $_openDialogLogin() {
+            this.dialog.login = {
+                show: true,
+                data: {
+                    username: '',
+                    password: '',
+                }
+            }
+        },
         $_login: function() {
+            sessionStorage.setItem('login', 'test')
             this.$router.push({name: 'home'})
         }
     },
