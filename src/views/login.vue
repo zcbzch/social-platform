@@ -11,15 +11,14 @@
         <div class="right">
             <div class="container">
                 <div class="top">
-                    <img class="icon" src="../assets/mylogo.png">
+                    <img class="icon" src="../assets/banana.png">
                     <div class="title">看看世界上的新鲜事</div>
                 </div>
                 <div class="bottom">
-                    <div class="word">现在就加入shine暮里</div>
-                    <el-button type="primary" round>注册</el-button>
+                    <div class="word">现在就加入ShineMory</div>
+                    <el-button type="primary" round @click="$_openDialogRegister">注册</el-button>
                     <el-button style="border: 1px solid #409EFF" round @click="$_openDialogLogin">登录</el-button>
                 </div>
-                
             </div>
         </div>
 
@@ -30,7 +29,7 @@
             <div class="login-container">
                 <div class="item">
                     <div class="prefix">帐号</div>
-                    <el-input placeholder="请输入密码" v-model="dialog.login.data.username" clearable></el-input>
+                    <el-input placeholder="请输入账号" v-model="dialog.login.data.username" clearable></el-input>
                 </div>
                 <div class="item">
                     <div class="prefix">密码</div>
@@ -42,10 +41,72 @@
                 <el-button type="primary" @click="$_login">登录</el-button>
             </span>
         </el-dialog>
+
+        <el-dialog
+            :visible.sync="dialog.register.show"
+            width="460px">
+
+            <el-steps slot="title" align-center :active="dialog.register.active" finish-status="success">
+                <el-step title="第一步"></el-step>
+                <el-step title="第二步"></el-step>
+                <el-step title="第三步"></el-step>
+            </el-steps>
+            <span class="tip-size" v-if="dialog.register.active == 2">选择你感兴趣的项目</span>
+            <span class="tip-size" v-else>创建你的账号</span>
+
+            <div class="login-container" v-if="dialog.register.active == 0">
+                <div class="item">
+                    <div class="prefix">名字</div>
+                    <el-input placeholder="请输入用户名" v-model="dialog.register.data.username" clearable></el-input>
+                </div>
+                <div class="item">
+                    <div class="prefix">邮箱</div>
+                    <el-input placeholder="请输入电子邮箱" v-model="dialog.register.data.email" show-password clearable></el-input>
+                </div>
+            </div>
+
+            <div class="login-container" v-if="dialog.register.active == 1">
+                <div class="item">
+                    <div class="prefix">密码</div>
+                    <el-input placeholder="请输入密码" v-model="dialog.register.data.password" show-password clearable></el-input>
+                </div>
+                <div class="item">
+                    <div class="prefix">重复密码</div>
+                    <el-input placeholder="请输入重复密码" v-model="dialog.register.rePassword" show-password clearable></el-input>
+                </div>
+                <div class="item">
+                    <div class="prefix">地址</div>
+                    <el-input placeholder="请输入地址" v-model="dialog.register.data.address" clearable></el-input>
+                </div>
+                <span v-if="wrongPassword" style="margin-left: 20px; color: red">两次密码输入不一致</span>
+            </div>
+
+            <div class="check-container" v-if="dialog.register.active == 2">
+                <el-checkbox 
+                    :indeterminate="dialog.register.isIndeterminate" 
+                    v-model="dialog.register.checkAll" 
+                    @change="handleCheckAllChange">
+                    全选
+                </el-checkbox>
+                <el-checkbox-group style="margin-top: 15px" v-model="dialog.register.checkedInterest" @change="handleCheckedInterestChange">
+                    <el-checkbox v-for="(item, index) in dialog.register.data.interest" :label="item" :key="index">{{item}}</el-checkbox>
+                </el-checkbox-group>
+            </div>
+
+            <span slot="footer" class="dialog-footer footer">
+                <el-button @click="dialog.register.show = false">取消</el-button>
+                <el-button type="primary" @click="next" v-if="dialog.register.active !== 2">下一步</el-button>
+                <el-button type="primary" @click="$_register" v-if="dialog.register.active == 2">提交</el-button>
+            </span>
+        </el-dialog>
+
     </div>
 </template>
 
 <script>
+
+const interestOptions = ['学习', '美食', '新闻', '旅游', '娱乐', '游戏']
+
 export default {
     name: 'login',
     data() {
@@ -58,8 +119,28 @@ export default {
                         password: '',
                     }
                 },
-                register: {},
+                register: {
+                    show: false,
+                    active: 0,
+                    data: {
+                        username: '',
+                        email: '',
+                        password: '',
+                        address: '',
+                        interest: interestOptions,
+                    },
+                    rePassword: '',
+                    isIndeterminate: true,
+                    checkAll: false,
+                    checkedInterest: [],
+                },
             },
+        }
+    },
+    computed: {
+        wrongPassword() {
+            return this.dialog.register.rePassword.length && 
+                (this.dialog.register.data.password !== this.dialog.register.rePassword)
         }
     },
     methods: {
@@ -72,9 +153,45 @@ export default {
                 }
             }
         },
+        $_openDialogRegister() {
+            this.dialog.register = {
+                show: true,
+                active: 0,
+                data: {
+                    username: '',
+                    email: '',
+                    password: '',
+                    address: '',
+                    interest: interestOptions,
+                },
+                rePassword: '',
+                isIndeterminate: true,
+                checkAll: false,
+                checkedInterest: [],
+            }
+        },
         $_login: function() {
             sessionStorage.setItem('login', 'test')
             this.$router.push({name: 'home'})
+        },
+        $_register: function() {
+            console.log(this.dialog.register.data)
+            this.dialog.register.show = false
+        },
+        next() {
+            if (this.dialog.register.active++ >= 2) 
+            this.dialog.register.active = 0;
+        },
+        handleCheckAllChange(val) {
+            let reg = this.dialog.register
+            reg.checkedInterest = val ? interestOptions : [];
+            reg.isIndeterminate = false;
+        },
+        handleCheckedInterestChange(val) {
+            let reg = this.dialog.register
+            let checkedCount = val.length
+            reg.checkAll = checkedCount === reg.data.interest.length
+            reg.isIndeterminate = checkedCount > 0 && checkedCount < reg.data.interest.length
         }
     },
 }
@@ -153,8 +270,17 @@ export default {
             font-size: 28px;
             font-weight: bold;
         }
+        .el-dialog__body {
+            text-align: left;
+        }
+        .tip-size {
+            margin-left: 50px;
+            font-size: 22px;
+            font-weight: bold;
+        }
         .login-container {
             padding: 0 20px;
+            margin-top: 40px;
             .item {
                 width: 100%;
                 height: 40px;
@@ -163,10 +289,20 @@ export default {
                 display: flex;
                 .prefix {
                     @flex-center();
-                    width: 80px;
+                    width: 100px;
                     margin-right: 16px;
-                    font-size: 20px;
+                    font-size: 18px;
                 }
+            }
+        }
+        .check-container {
+            padding: 0 25px;
+            margin-top: 40px;
+            text-align: left;
+            .el-checkbox {
+                width: 120px;
+                margin: 5px 0;
+                text-align: center;
             }
         }
         .footer {

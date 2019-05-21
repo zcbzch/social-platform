@@ -23,15 +23,10 @@
             </div>
 
             <div class="middle">
-                <img class="icon" src="../assets/mylogo.png">
+                <img class="icon" src="../assets/banana.png">
             </div>
 
             <div class="right">
-                <!-- <el-tooltip effect="dark" content="个人资料与帐号" placement="bottom">
-                    <div class="user">
-                        <img src="../assets/van.png">
-                    </div>
-                </el-tooltip> -->
                 <el-tooltip effect="dark" content="个人资料与帐号" placement="bottom" >
                     <el-popover
                         placement="bottom"
@@ -66,6 +61,8 @@
 
         <div class="container">
             <div class="content">
+
+                <!-- 个人信息 -->
                 <div class="left">
                     <div class="user-information">
                         <div class="background-picture"></div>
@@ -94,12 +91,50 @@
                     </div>
                 </div>
 
+                <!-- 文章内容 -->
                 <div class="middle">
-                    <div class="user-content">
+                    <div class="user-content"
+                        v-for="(item, index) in article" 
+                        :key="index"
+                        @click="(index) => {
+                            console.log(index)
+                        }">
+                        <div class="context">
+                            <div class="content">          
+                                <div class="item-header">
+                                    <el-image class="the-img" src="" fit="cover">
+                                        <div slot="error" class="image-slot">
+                                            <i class="el-icon-picture-outline"></i>
+                                        </div>
+                                    </el-image>
+                                    <strong class="username">name</strong>
+                                    <i class="el-icon-success success"></i>
+                                    <span class="time">{{ $_formatTime(1557426567806) }}</span>
+                                </div>
+                                <div class="item-text-container">
+                                    <span>谷歌停止华为合作将对华为造成什么影响谷歌暂停与华为部分合作路透社（Reuters）周日报道称，谷歌已暂停与华为的合作，该业务不属于开源许可范围。这意味着今后华为手机将不能使用Google Play Store、Gmail和YouTube等服务。此外，谷歌还将停止就安卓和谷歌服务为华为提供技术支持和协作。</span>
+                                    <div class="picture">
+                                        <el-image class="the-img" src="" fit="cover"></el-image>
+                                    </div>
+                                </div>
+                                <div class="action-list">
+                                    <div class="item">
+                                        <i class="el-icon-chat-line-round"></i>
+                                        <span class="item-num">221</span>
+                                    </div>
+                                    <div class="item">
+                                        <span class="icon iconfont">&#xeca1;</span>
+                                        <span class="item-num">1万</span>
+                                    </div>
+                                </div>
+                            </div>
 
+                        </div>
                     </div>
+                    <div class="content-end"></div>
                 </div>
 
+                <!-- 推荐关注 -->
                 <div class="right">
                     <div class="recommend">
                         <span>推荐关注</span>
@@ -108,16 +143,95 @@
             </div>
         </div>
 
+        <el-dialog
+            :visible.sync="dialog.article.show"
+            width="640">
+                <div class="dialog-container">
+                    <div class="article-dialog">
+                        <div class="item-header">
+                            <el-image class="the-img" src="" fit="cover">
+                                <div slot="error" class="image-slot">
+                                    <i class="el-icon-picture-outline"></i>
+                                </div>
+                            </el-image>
+                            <strong class="username">name</strong>
+                            <i class="el-icon-success success"></i>
+                        </div>
+                        <div class="item-text-container">
+                            <span>谷歌停止华为合作将对华为造成什么影响谷歌暂停与华为部分合作路透社（Reuters）周日报道称，谷歌已暂停与华为的合作，该业务不属于开源许可范围。这意味着今后华为手机将不能使用Google Play Store、Gmail和YouTube等服务。此外，谷歌还将停止就安卓和谷歌服务为华为提供技术支持和协作。</span>
+                            <div class="picture">
+                                <el-image class="the-img" src="" fit="cover"></el-image>
+                            </div>
+                            <span class="time">{{ $_formatTimeAll(1557426567806) }}</span>
+                        </div>
+                        <div class="action-list">
+                            <div class="item">
+                                <i class="el-icon-chat-line-round"></i>
+                                <span class="item-num">221</span>
+                            </div>
+                            <div class="item">
+                                <span class="icon iconfont">&#xeca1;</span>
+                                <span class="item-num">1万</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="reply"
+                        v-for="(item, index) in article"
+                        :key="index">
+                        <div class="reply-container">
+                            <div class="article-dialog">
+                                <div class="item-header">
+                                    <el-image class="the-img" src="" fit="cover">
+                                        <div slot="error" class="image-slot">
+                                            <i class="el-icon-picture-outline"></i>
+                                        </div>
+                                    </el-image>
+                                    <strong class="username">name</strong>
+                                    <span class="time">{{ $_formatTime(1557426567806) }}</span>
+                                </div>
+                                <div class="item-text-container">
+                                    <span>as we can</span>
+                                </div>
+                                <div class="action-list">
+                                    <div class="item">
+                                        <i class="el-icon-chat-line-round"></i>
+                                        <span class="item-num">221</span>
+                                    </div>
+                                    <div class="item">
+                                        <span class="icon iconfont">&#xeca1;</span>
+                                        <span class="item-num">1万</span>
+                                    </div>
+                                </div>              
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        </el-dialog>
+
     </div>
 </template>
 
 <script>
+
 export default {
     name: "home",
     data() {
         return {
             activeTopbar: 'home',
+            dialog: {
+                article: {
+                    show: true,
+                }
+            },
+            article: [
+                {},
+                {},
+                {}
+            ],
         }
+    },
+    computed: {
+
     },
     methods: {
         $_authority() {
@@ -130,6 +244,30 @@ export default {
         $_logout() {
             sessionStorage.clear()
             this.$router.push({name: 'login'})
+        },
+        //距离现在时间
+        $_formatTime(time) {
+            // let now = new Date()
+            let diff = new Date().getTime() - time
+            const minute = 60 * 1000
+            const hour = 60 * minute
+            const day = 24 * hour
+            if(diff < minute) {
+                return '1分钟'
+            } else if(diff > minute && diff < hour) {
+                return Math.floor(diff/minute)+'分钟'
+            } else if(diff > hour && diff < day) {
+                return Math.floor(diff/hour)+'小时'
+            } else if(diff > day) {
+                let myTime = new Date(time)
+                return (myTime.getMonth()+1)+'月'+myTime.getDate()+'日'
+            }
+        },
+        //完整时间
+        $_formatTimeAll(time) {
+            let myTime = new Date(time)
+            let ampm = myTime.getHours() > 12 ? '下午':'上午'
+            return `${ampm}${myTime.getHours()}:${myTime.getMinutes()} - ${myTime.getFullYear()}年${myTime.getMonth() + 1}月${myTime.getDate()}日`
         }
     },
     mounted() {
@@ -154,6 +292,7 @@ export default {
             background-color: #fff;
             display: flex;
             position: fixed;
+            z-index: 1000;
             .left {
                 .el-tabs__nav-wrap::after {
                     height: 0;
@@ -212,17 +351,17 @@ export default {
 
         .container {
             width: 100%;
-            height: 800px;
-            padding: 60px 50px;
+            padding: 60px calc(50% - 570px);
                 background-color: rgba(217, 236, 255, .5);
             .content {
                 width: 100%;
                 height: 100%;
                 display: flex;
+                margin: auto;
                 .left {
-                    margin-right: 18px;
+                    margin-right: 10px;
                     .user-information {
-                        width: 290px;
+                        width: 288px;
                         height: 230px;
                         background-color: #fff;
                         .background-picture {
@@ -264,7 +403,7 @@ export default {
                             position: relative;
                             top: -42px;
                             .item {
-                                margin-left: 18px;
+                                margin-left: 10px;
                                 width: 80px;
                                 text-align: left;
                                 .top {
@@ -284,11 +423,79 @@ export default {
                     }
                 }
                 .middle {
-                    width: 100%;
-                    margin-right: 18px;
+                    min-width: 588px;
+                    margin-right: 10px;
                     .user-content {
+                        border-bottom: 1px solid #e6ecf0;
                         width: 100%;
-                        height: 300px;
+                        background-color: #fff;
+                        .context {
+                            padding: 9px 12px;
+                            cursor: pointer;
+                            &:hover{
+                                background: #f5f8fa;
+                            }
+                            .content {
+                                margin-left: 58px;
+                                font-size: 14px;
+                                display: block;
+                                text-align: left;
+                                .item-header {
+                                    .the-img {
+                                        .avator();
+                                        float: left;
+                                        display: absolute;
+                                        margin-left: -58px;
+                                    }
+                                    
+                                    .username {
+                                        word-break: break-all;
+                                        font-weight: bold;
+                                        &:hover {
+                                            color: #409EFF;
+                                            text-decoration: underline;
+                                        }
+                                    }
+                                    .success {
+                                        color: #409EFF;
+                                        margin: 5px;
+                                    }
+                                    .time {
+                                        color: #657786;
+                                    }
+                                }
+                                .item-text-container {
+                                    width: 506px;
+                                    span {
+                                        word-wrap: break-word;
+                                    }
+                                    .picture {
+                                        margin-top: 10px;
+                                        border-radius: 12px;
+                                        overflow: hidden;
+                                        .the-img {
+                                            width: 100%;
+                                            height: 380px;
+                                            background-color: #eee;
+                                        }
+                                    }
+                                }
+                                .action-list {
+                                    margin-top: 15px;
+                                    margin-bottom: 5px;
+                                    display: flex;
+                                    .item{
+                                        .item();
+                                    };
+                                }
+                            }
+                            
+                        }
+                    }
+                    .content-end {
+                        width: 100%;
+                        height: 60px;
+                        border-top: 1px solid #EBEEF5;
                         background-color: #fff;
                     }
                 }
@@ -305,6 +512,132 @@ export default {
                             font-weight: bold;
                             color: #14171a;
                         }
+                    }
+                }
+            }
+        }
+    }
+
+    .avator {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background-color: #fff;
+        color: #909399;
+        text-align: center;
+        line-height: 48px;
+        margin-top: 3px;
+    }
+    .item {
+        width: 80px;
+        display: flex;
+        align-items: center;
+        color: #657786;
+        font-size: 12px;
+        font-weight: bold;
+        cursor: pointer;
+        &:hover {
+            color: #409EFF;
+        }
+        i {
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .item-num {
+            margin-left: 10px;
+        }
+    }
+
+    .dialog-container {
+        padding: 0 20px;
+        .article-dialog {
+            border-bottom: 1px solid #e6ecf0;
+            .item-header {
+                display: flex;
+                margin-bottom: 15px;
+                .the-img {
+                    .avator();
+                    background-color: #eee;
+                    margin-right: 10px;
+                }
+                .username {
+                    line-height: 48px;
+                    font-size: 18px;
+                    font-weight: bold;
+                    &:hover {
+                        color: #409EFF;
+                        text-decoration: underline;
+                    }
+                }
+                .success {
+                    font-size: 18px;
+                    line-height: 48px;
+                    color: #409EFF;
+                    margin: 0 5px;
+                }
+                .time {
+                    margin-left: 10px;
+                    line-height: 48px;
+                    color: #657786;
+                }
+            }
+            .item-text-container {
+                text-align: left;
+                font-size: 27px;;
+                letter-spacing: .01em;
+                color: #14171a;
+                span {
+                    word-wrap: break-word;
+                }
+                .time {
+                    color: #657786;
+                    font-size: 14px;
+                }
+                .picture {
+                    width: 560px;
+                    margin: 15px auto;
+                    border-radius: 12px;
+                    overflow: hidden;
+                    .the-img {
+                        width: 100%;
+                        height: 420px;
+                        background-color: #eee;
+                    }
+                }
+            }
+            .action-list {
+                display: flex;
+                margin: 15px 0;
+                .item{
+                    .item();
+                };
+            }
+        }
+        .reply {
+            padding: 10px 0;
+            border-bottom: 1px solid #e6ecf0;
+            .reply-container {
+                margin-left: 58px;
+                .article-dialog {
+                    border-bottom: none;
+                    .item-header {
+                        margin-bottom: 0;
+                        .the-img {
+                            float: left;
+                            display: absolute;
+                            margin-left: -58px;
+                        }
+                    }
+                    .item-text-container {
+                        span {
+                            font-size: 14px;
+                            white-space: pre-wrap;
+                            line-height: 20px;
+                        }
+                    }
+                    .action-list {
+                        margin: 15px 0 5px 0;
+                        // margin-left: -58px;
                     }
                 }
             }

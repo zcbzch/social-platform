@@ -1,0 +1,29 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd" >
+<!--
+2013-9-30: Created.
+-->
+<svg>
+<metadata>
+Created by iconfont
+</metadata>
+<defs>
+
+<font id="iconfont" horiz-adv-x="1024" >
+  <font-face
+    font-family="iconfont"
+    font-weight="500"
+    font-stretch="normal"
+    units-per-em="1024"
+    ascent="896"
+    descent="-128"
+  />
+    <missing-glyph />
+    
+    <glyph glyph-name="aixin" unicode="&#60577;" d="M171.712 324.352l0.352-0.32 287.904-252.8a64 64 0 0 1 82.912-1.344l296.832 244.544a215.584 215.584 0 1 1-301.824 300.576L512 579.328l-25.888 35.616a215.584 215.584 0 1 1-314.4-290.624zM32 488.416a279.584 279.584 0 0 0 480 194.944 279.584 279.584 0 0 0 480-194.944 278.144 278.144 0 0 0-113.024-224.512l-295.36-243.392a128 128 0 0 0-165.888 2.592L129.984 275.84A278.976 278.976 0 0 0 32 488.416z"  horiz-adv-x="1024" />
+
+    
+
+
+  </font>
+</defs></svg>
