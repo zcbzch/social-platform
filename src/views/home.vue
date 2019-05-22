@@ -96,9 +96,7 @@
                     <div class="user-content"
                         v-for="(item, index) in article" 
                         :key="index"
-                        @click="(index) => {
-                            console.log(index)
-                        }">
+                        @click="$_openReply(index)">
                         <div class="context">
                             <div class="content">          
                                 <div class="item-header">
@@ -137,7 +135,24 @@
                 <!-- 推荐关注 -->
                 <div class="right">
                     <div class="recommend">
-                        <span>推荐关注</span>
+                        <span class="word">推荐关注</span>
+                        <span class="refresh">刷新</span>
+                        <div class="recommend-body"
+                            v-for="(item, index) in article"
+                            :key="index">
+                            <div class="item-header">
+                                <el-image class="the-img" src="" fit="cover">
+                                    <div slot="error" class="image-slot">
+                                        <i class="el-icon-picture-outline"></i>
+                                    </div>
+                                </el-image>
+                                <strong class="username">name</strong>
+                                <i class="el-icon-success success"></i>
+                                <div class="follow">
+                                    <el-button type="primary" size="mini" round>关注</el-button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -220,7 +235,7 @@ export default {
             activeTopbar: 'home',
             dialog: {
                 article: {
-                    show: true,
+                    show: false,
                 }
             },
             article: [
@@ -244,6 +259,11 @@ export default {
         $_logout() {
             sessionStorage.clear()
             this.$router.push({name: 'login'})
+        },
+        //打开回复弹出框
+        $_openReply(index) {
+            console.log(index)
+            this.dialog.article.show = true
         },
         //距离现在时间
         $_formatTime(time) {
@@ -511,6 +531,50 @@ export default {
                             font-size: 18px;
                             font-weight: bold;
                             color: #14171a;
+                        }
+                        .refresh {
+                            cursor: pointer;
+                            margin-left: 15px;
+                            margin-bottom: 15px;
+                            font-size: 14px;
+                            font-weight: 400;
+                            color:#409EFF;
+                        }
+                        .recommend-body {
+                            border-bottom: 1px solid #e6ecf0;
+                            .item-header {
+                                display: flex;
+                                margin: 15px 0;
+                                .the-img {
+                                    .avator();
+                                    background-color: #eee;
+                                    margin-right: 10px;
+                                }
+                                .username {
+                                    line-height: 51px;
+                                    font-size: 14px;
+                                    font-weight: bold;
+                                    &:hover {
+                                        color: #409EFF;
+                                        text-decoration: underline;
+                                    }
+                                }
+                                .follow {
+                                    margin-left: 15px;
+                                    line-height: 51px;
+                                    span {
+                                        font-weight: 400;
+                                        color: #fff;
+                                        font-size: 12px;
+                                    }
+                                }
+                                .success {
+                                    font-size: 14px;
+                                    line-height: 48px;
+                                    color: #409EFF;
+                                    margin: 0 5px;
+                                }
+                            }
                         }
                     }
                 }
