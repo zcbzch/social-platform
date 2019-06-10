@@ -43,7 +43,8 @@
             </div>
             <span slot="footer" class="dialog-footer footer">
                 <el-button @click="dialog.login.show = false">取消</el-button>
-                <el-button type="primary" @click="$_login">登录</el-button>
+                <el-button type="primary" v-if="dialog.login.data.type=='user'" @click="$_login">登录</el-button>
+                <el-button type="primary" v-else @click="$_loginAdmin">登录</el-button>
             </span>
         </el-dialog>
 
@@ -183,6 +184,8 @@ export default {
             }
         },
         $_login: async function() {
+            console.log(this.dialog.login.data.type)
+            if(this.dialog.login.data.type != 'user') return
             let params = {
                 email: this.dialog.login.data.email,
                 password: this.dialog.login.data.password,
@@ -195,6 +198,23 @@ export default {
                 sessionStorage.access_token = data.access_token;
                 axios.defaults.headers.common['Authorization'] = `ShineMory ${data.access_token}`;
                 this.$router.push({name: 'header'})
+            }
+        },
+        $_loginAdmin: async function() {
+            console.log(this.dialog.login.data.type)
+            if(this.dialog.login.data.type != 'admin') return
+            let params = {
+                email: this.dialog.login.data.email,
+                password: this.dialog.login.data.password,
+            }
+            let data = await this.$api.login.$_loginAdmin.call(this, params)
+            if(data !== false) {
+                sessionStorage.setItem('login', data.username)
+                sessionStorage.setItem('id', data.user_id)
+                sessionStorage.setItem('type', this.dialog.login.data.type)
+                sessionStorage.access_token = data.access_token;
+                axios.defaults.headers.common['Authorization'] = `ShineMory ${data.access_token}`;
+                this.$router.push({name: 'admin'})
             }
         },
         $_register: async function() {

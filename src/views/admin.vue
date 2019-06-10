@@ -44,7 +44,6 @@
                                     <div class="Grid-cell">
                                         <div class="ProfileHeaderCard">
                                             <h1>老夫写代码</h1>
-<!--                                            <h2>@coderzhj</h2>-->
                                             <div>
                                                 <span>加入于 2016年3月</span>
                                             </div>
@@ -56,27 +55,27 @@
                                 <div class="Grid-cell">
                                     <div class="GridTimeline" style="margin-top:10px">
                                         <div class="Grid">
-                                            <div class="Grid-cell u-mb10" v-for="(item, index) in users" :key="item.id">
+                                            <div class="Grid-cell u-mb10" v-for="(item, index) in users" :key="item.user_id">
                                                     <div class="ProfileCard">
                                                         <div class="ProfileCard-bg" style="background-color: #1CA1F2"/>
                                                         <div class="ProfileCard-content">
                                                             <div class="ProfileCard-avatarLink">
-                                                                <img class="ProfileCard-avatarImage js-action-profile-avatar" src="https://pbs.twimg.com/profile_images/1134489351709110272/33JDNE7Y_bigger.png" alt=""/>
+                                                                <img class="ProfileCard-avatarImage js-action-profile-avatar" :src="item.avatar_src" alt=""/>
                                                             </div>
                                                             <div class="ProfileCard-actions">
                                                                 <div class="u-textLeft">
-                                                                    <button @click="handleDelete(index)" type="button" class="following-delete-text">
+                                                                    <button @click="handleDelete(item)" type="button" class="following-delete-text">
                                                                         <span>删除</span>
                                                                     </button>
-                                                                    <button @click="handleStop(index)" type="button" :class="item.stop ? 'following-text' : 'following-stop-text'">
-                                                                        <span>{{ item.stop ? '解封':'封禁' }}</span>
+                                                                    <button @click="handleStop(item)" type="button" :class="item.stop ? 'following-text' : 'following-stop-text'">
+                                                                        <span>{{ item.ban ? '解封':'封禁' }}</span>
                                                                     </button>
                                                                 </div>
                                                             </div>
                                                             <div class="ProfileCard-userFields">
-                                                                <div class="ProfileNameTruncated">{{ item.nickname }}</div>
-                                                                <span class="ProfileCard-screenname">{{ item.name }}</span>
-                                                                <p class="ProfileCard-bio">{{ item.motto }}</p>
+                                                                <div class="ProfileNameTruncated">{{ item.username }}</div>
+                                                                <span class="ProfileCard-screenname">{{ item.email }}</span>
+                                                                <p class="ProfileCard-bio">{{ item.about_me }}</p>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -174,11 +173,7 @@
                         show: false,
                     }
                 },
-                article: [
-                    {},
-                    {},
-                    {}
-                ],
+                article: [],
                 notice: [
                     {
                         id: 1,
@@ -218,27 +213,6 @@
                         id: 1,
                         stop: true
                     },
-                    {
-                        nickname: '老夫写代码',
-                        name: '@codezhj',
-                        motto: '邮箱：xxx@xx.com',
-                        id: 2,
-                        stop: false
-                    },
-                    {
-                        nickname: '老夫写代码',
-                        name: '@codezhj',
-                        motto: '邮箱：xxx@xx.com',
-                        id: 3,
-                        stop: false
-                    },
-                    {
-                        nickname: '老夫写代码',
-                        name: '@codezhj',
-                        motto: '邮箱：xxx@xx.com',
-                        id: 4,
-                        stop: false
-                    },
                 ]
             }
         },
@@ -246,11 +220,30 @@
 
         },
         methods: {
-            handleDelete(index) {
-                this.users.splice(index, 1);
+            async handleDelete(item) {
+                console.log(item)
+                let params = {
+                    user_id: item.user_id
+                }
+                let data = await this.$api.admin.$_deleteUser.call(this, params)
+                if(data !== false) {
+                    this.$message.success('删除成功')
+                    this.$_getUser()
+                }
             },
-            handleStop(index) {
-                this.users[index].stop = !this.users[index].stop;
+            async handleStop(item) {
+                let i = 0
+                if(item.ban) i = 0;
+                else i = 1 
+                let params = {
+                    user_id: item.user_id,
+                    ban: i
+                }
+                let data = await this.$api.admin.$_banUser.call(this, params)
+                if(data !== false) {
+                    this.$message.success('操作成功')
+                    this.$_getUser()
+                }
             },
             handleSuccess(response, file, fileList) {
                 this.imgUrl = file.url;
@@ -269,6 +262,14 @@
             changeVisible(index) {
                 this.deleteId = index;
                 this.dialogVisible = !this.dialogVisible;
+            },
+            async $_getUser() {
+                let data = await this.$api.admin.$_getUser.call(this)
+                if(data !== false) {
+                    console.log(data)
+                    this.users = data
+                    // this.
+                }
             },
             onSubmit() {
                 console.log(this.form);
@@ -312,6 +313,9 @@
                 let ampm = myTime.getHours() > 12 ? '下午':'上午'
                 return `${ampm}${myTime.getHours()}:${myTime.getMinutes()} - ${myTime.getFullYear()}年${myTime.getMonth() + 1}月${myTime.getDate()}日`
             }
+        },
+        mounted() {
+            this.$_getUser()
         }
     };
 </script>

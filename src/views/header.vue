@@ -12,7 +12,7 @@
                             </div>
                         </span>
                 </el-tab-pane>
-                <el-tab-pane name="chat">
+                <el-tab-pane name="chat" v-if="false">
                         <span slot="label">
                             <div class="tab-container" @click="$_chat">
                                 <i class="el-icon-s-comment icon-size"></i>
@@ -34,12 +34,12 @@
                                           <div v-for="(item, index) in notice" :key="index">
                                               <div style="text-align: left; margin: 3px 10px;">
                                                   <el-card shadow="always">
-                                                      {{ item.content }}
-                                                      <el-button size="mini" type="text" @click="deleteNotice(index)">确认</el-button>
+                                                      {{ item.body }}
+                                                      <el-button size="mini" type="text" @click="deleteNotice(item.message_id)">确认</el-button>
                                                   </el-card>
                                               </div>
                                           </div>
-                                          <el-button type="text" slot="reference">消息</el-button>
+                                          <el-button type="text" slot="reference" @click="$_getMessage">消息</el-button>
                                     </el-popover>
                                 </span>
                             </div>
@@ -70,7 +70,7 @@
                     </div>
 
                     <div class="user" slot="reference">
-                        <img :src="userInfo.avatar_src?userInfo.avatar_src:'../assets/van.png'">
+                        <img :src="userInfo.avatar_src?userInfo.avatar_src:'https://pbs.twimg.com/profile_images/993799221559025664/FFcEtWpM_400x400.jpg'">
                     </div>
                 </el-popover>
             </el-tooltip>
@@ -80,11 +80,23 @@
                     font-weight: bold;"
                        type="primary"
                        size="mini"
+                       v-if="type == 'user'"
+                       round @click="pushVisible = true;this.form3 = {content: '',fileList: []}">
+                {{ `发推` }}
+            </el-button>
+            <el-button style="
+                    margin-left:20px;
+                    font-size: 14px;
+                    font-weight: bold;"
+                       type="primary"
+                       size="mini"
+                       v-else
                        round @click="pushVisible = true">
-                {{ type == 'user' ?  '发推' : '发通知'}}
+                {{ '发通知' }}
             </el-button>
         </div>
     </div>
+
     <el-dialog
             title="发送内容"
             :visible.sync="pushVisible"
@@ -102,7 +114,9 @@
             <el-form-item label="推文图片" v-show="type == 'user'">
                 <el-upload
                         class="upload-demo"
-                        action="https://jsonplaceholder.typicode.com/posts/"
+                        action="/api/v1/article/pic"
+                        :headers="uploadHeader"
+                        name="pic"
                         :on-preview="handlePreview"
                         :on-remove="handleRemove"
                         :on-success="handlePushSuccess"
@@ -114,11 +128,14 @@
                 </el-upload>
             </el-form-item>
             <el-form-item>
-                <el-button type="primary" @click="submitPush">发送</el-button>
+                <el-button type="primary" @click="submitPush" v-if="type == 'user'">发送</el-button>
+                <el-button type="primary" @click="$_pushMessage" v-else>发送</el-button>
                 <el-button @click="pushVisible = false">取消</el-button>
             </el-form-item>
         </el-form>
     </el-dialog>
+
+
         <el-dialog :visible.sync="bigImgVisible">
             <img width="100%" :src="bigImageUrl" alt="">
         </el-dialog>
@@ -137,21 +154,10 @@
                 pushVisible: false,
                 userInfo: {},
                 bigImageUrl: '',
+                uploadHeader: '',
                 activeTopbar: 'home',
-                notice: [
-                    {
-                        id: 1,
-                        content: "这是一条系统通知"
-                    },
-                    {
-                        id: 2,
-                        content: "2这是一条系统通知"
-                    },
-                    {
-                        id: 3,
-                        content: "3这是一条系统通知"
-                    }
-                ],
+                picSrc: '',
+                notice: [],
                 form3: {
                     content: '',
                     fileList: []
@@ -176,6 +182,17 @@
                     this.$store.state.userInfo = data
                 }
             },
+            async $_pushMessage() {
+                let params = {
+                    body: this.form3.content
+                }
+                let data = await this.$api.admin.$_notify.call(this, params)
+                if(data !== false) {
+                    this.$message.success('推送成功')
+                    this.pushVisible = false
+                }
+
+            },
             handleRemove(file, fileList) {
                 console.log(file, fileList);
             },
@@ -183,19 +200,37 @@
                 this.bigImgVisible = true;
                 this.bigImageUrl = file.url;
             },
-            deleteNotice(index) {
-                console.log(this.notice[index]);
-                this.notice.splice(index, 1);
-                if (this.notice.length <= 0) {
-                    this.visible = false;
+            async deleteNotice(id) {
+                let params = {
+                    message_id: id
+                }
+                let data = await this.$api.admin.$_deleteNotice.call(this, params)
+                if(data !== false) {
+                    this.$_getMessage()
                 }
             },
-            submitPush() {
-                this.pushVisible = false;
-                console.log(this.form3.content);
-                console.log(this.form3.url);
+            async $_getMessage() {
+                let data = await this.$api.home.$_getMessage.call(this)
+                if(data !== false) {
+                    this.notice = data
+                    console.log(data)
+                }
+            },
+            async submitPush() {
+                let params = {
+                    pic_src: this.picSrc,
+                    body: this.form3.content || '',
+                }
+                let data = await this.$api.home.$_submit.call(this, params)
+                if(data !== false) {
+                    this.$message.success('发送成功')
+                    this.pushVisible = false
+                }
+                // console.log(this.form3.content);
+                // console.log(this.form3.url);
             },
             handlePushSuccess(response, file) {
+                this.picSrc = response.pic_src
                 this.form3.url = file.url;
             },
             $_home() {
@@ -211,6 +246,7 @@
             $_info() {
                 this.$router.push({name: 'info'})
             },
+            
             $_logout() {
                 sessionStorage.clear()
                 this.$router.push({name: 'login'})
@@ -223,6 +259,7 @@
             } else {
                 this.$router.push({name: 'admin'})
             }
+            this.uploadHeader= {'Authorization': `ShineMory ${sessionStorage.access_token}`}
         }
     };
 </script>

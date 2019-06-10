@@ -2,6 +2,7 @@ import base from './base.js'
 import token from './token.js'
 import login from './login.js'
 import home from './home.js'
+import admin from './admin.js'
 
 const install = (Vue) => {
     Vue.prototype.$api = {
@@ -18,6 +19,7 @@ const install = (Vue) => {
         token,
         login,
         home,
+        admin,
     }
 }
 

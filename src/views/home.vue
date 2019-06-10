@@ -6,26 +6,26 @@
 
                 <!-- 个人信息 -->
                 <div class="left">
-                    <div class="user-information">
+                    <div class="user-information" @click="()=>{this.$router.push({name:'info'})}">
                         <div class="background-picture"></div>
                         <div class="user-icon">
-                            <img :src="userInfo.avatar_src?userInfo.avatar_src:'../assets/van.png'">
+                            <img :src="userInfo.avatar_src">
                         </div>
                         <div class="user-data">
-                            <div class="user-name">{{ userInfo.username || '老夫写代码' }}</div>                        
+                            <div class="user-name">{{ userInfo.username }}</div>                        
                         </div>
                         <div class="other-data">
                             <div class="item">
                                 <div class="top">推文</div>
-                                <span>{{ userInfo.articles_num || '3' }}</span>
+                                <span>{{ userInfo.articles_num }}</span>
                             </div>
                             <div class="item">
                                 <div class="top">正在关注</div>
-                                <span>{{ userInfo.follows_num || '5' }}</span>
+                                <span>{{ userInfo.follows_num }}</span>
                             </div>
                             <div class="item">
                                 <div class="top">关注者</div>
-                                <span>{{ userInfo.fans_num || '2' }}</span>
+                                <span>{{ userInfo.fans_num }}</span>
                             </div>
                         </div>
                         
@@ -37,33 +37,33 @@
                     <div class="user-content"
                         v-for="(item, index) in article" 
                         :key="index"
-                        @click="$_openReply(index)">
+                        @click="$_openReply(article[index])">
                         <div class="context">
                             <div class="content">          
                                 <div class="item-header">
-                                    <el-image class="the-img" src="" fit="cover">
+                                    <el-image class="the-img" :src="item.avatar_src" fit="cover">
                                         <div slot="error" class="image-slot">
                                             <i class="el-icon-picture-outline"></i>
                                         </div>
                                     </el-image>
-                                    <strong class="username">name</strong>
+                                    <strong class="username">{{ item.username }}</strong>
                                     <i class="el-icon-success success"></i>
-                                    <span class="time">{{ $_formatTime(1557426567806) }}</span>
+                                    <span class="time">{{ $_formatTime(item.send_time) }}</span>
                                 </div>
                                 <div class="item-text-container">
-                                    <span>谷歌停止华为合作将对华为造成什么影响谷歌暂停与华为部分合作路透社（Reuters）周日报道称，谷歌已暂停与华为的合作，该业务不属于开源许可范围。这意味着今后华为手机将不能使用Google Play Store、Gmail和YouTube等服务。此外，谷歌还将停止就安卓和谷歌服务为华为提供技术支持和协作。</span>
+                                    <span>{{ item.body }}</span>
                                     <div class="picture">
-                                        <el-image class="the-img" src="" fit="cover"></el-image>
+                                        <el-image class="the-img" v-if="item.pic_src" :src="item.pic_src" fit="cover"></el-image>
                                     </div>
                                 </div>
                                 <div class="action-list">
                                     <div class="item">
                                         <i class="el-icon-chat-line-round"></i>
-                                        <span class="item-num">221</span>
+                                        <span class="item-num">{{ item.comments_num }}</span>
                                     </div>
                                     <div class="item">
                                         <span class="icon iconfont">&#xeca1;</span>
-                                        <span class="item-num">1万</span>
+                                        <span class="item-num">{{ item.zan }}</span>
                                     </div>
                                 </div>
                             </div>
@@ -77,20 +77,20 @@
                 <div class="right">
                     <div class="recommend">
                         <span class="word">推荐关注</span>
-                        <span class="refresh">刷新</span>
+                        <span class="refresh" @click="$_recommend">刷新</span>
                         <div class="recommend-body"
-                            v-for="(item, index) in article"
+                            v-for="(item, index) in recommend"
                             :key="index">
                             <div class="item-header">
-                                <el-image class="the-img" src="" fit="cover">
+                                <el-image class="the-img" :src="item.avatar_src" fit="cover">
                                     <div slot="error" class="image-slot">
                                         <i class="el-icon-picture-outline"></i>
                                     </div>
                                 </el-image>
-                                <strong class="username">name</strong>
+                                <strong class="username">{{ item.username }}</strong>
                                 <i class="el-icon-success success"></i>
                                 <div class="follow">
-                                    <el-button type="primary" size="mini" round>关注</el-button>
+                                    <el-button type="primary" size="mini" @click="$_follow(item.user_id)" round>关注</el-button>
                                 </div>
                             </div>
                         </div>
@@ -105,57 +105,64 @@
                 <div class="dialog-container">
                     <div class="article-dialog">
                         <div class="item-header">
-                            <el-image class="the-img" src="" fit="cover">
+                            <el-image class="the-img" :src="dialog.article.data.avatar_src" fit="cover">
                                 <div slot="error" class="image-slot">
                                     <i class="el-icon-picture-outline"></i>
                                 </div>
                             </el-image>
-                            <strong class="username">name</strong>
+                            <strong class="username">{{ dialog.article.data.username }}</strong>
                             <i class="el-icon-success success"></i>
                         </div>
                         <div class="item-text-container">
-                            <span>谷歌停止华为合作将对华为造成什么影响谷歌暂停与华为部分合作路透社（Reuters）周日报道称，谷歌已暂停与华为的合作，该业务不属于开源许可范围。这意味着今后华为手机将不能使用Google Play Store、Gmail和YouTube等服务。此外，谷歌还将停止就安卓和谷歌服务为华为提供技术支持和协作。</span>
-                            <div class="picture">
-                                <el-image class="the-img" src="" fit="cover"></el-image>
+                            <span>{{ dialog.article.data.body }}</span>
+                            <div class="picture" >
+                                <el-image class="the-img" v-if="dialog.article.data.pic_src" :src="dialog.article.data.pic_src" fit="cover"></el-image>
                             </div>
-                            <span class="time">{{ $_formatTimeAll(1557426567806) }}</span>
+                            <span class="time">{{ $_formatTimeAll(dialog.article.data.send_time) }}</span>
                         </div>
                         <div class="action-list">
                             <div class="item">
                                 <i class="el-icon-chat-line-round"></i>
-                                <span class="item-num">221</span>
+                                <span class="item-num">{{ dialog.article.data.comments_num }}</span>
                             </div>
                             <div class="item">
                                 <span class="icon iconfont">&#xeca1;</span>
-                                <span class="item-num">1万</span>
+                                <span class="item-num">{{ dialog.article.data.zan }}</span>
                             </div>
                         </div>
                     </div>
                     <div class="reply"
-                        v-for="(item, index) in article"
+                        v-for="(item, index) in comment"
                         :key="index">
                         <div class="reply-container">
                             <div class="article-dialog">
                                 <div class="item-header">
-                                    <el-image class="the-img" src="" fit="cover">
+                                    <el-image class="the-img" :src="item.avatar_src" fit="cover">
                                         <div slot="error" class="image-slot">
                                             <i class="el-icon-picture-outline"></i>
                                         </div>
                                     </el-image>
-                                    <strong class="username">name</strong>
-                                    <span class="time">{{ $_formatTime(1557426567806) }}</span>
+
+                                    <strong class="username">{{ item.username }}</strong>
+                                    <span class="time">{{ $_formatTime(item.send_time) }}</span>
+                                    <!-- <div class="action-list" style="position:absolute;right:40px;margin-top:10px;">
+                                        <div class="item">
+                                            <span class="icon iconfont">&#xeca1;</span>
+                                            <span class="item-num">{{ item.zan_num }}</span>
+                                        </div>
+                                    </div> -->
                                 </div>
                                 <div class="item-text-container">
-                                    <span>as we can</span>
+                                    <span>{{ item.body }}</span>
                                 </div>
                                 <div class="action-list">
                                     <div class="item">
                                         <i class="el-icon-chat-line-round"></i>
-                                        <span class="item-num">221</span>
+                                        <span class="item-num">{{ }}</span>
                                     </div>
                                     <div class="item">
                                         <span class="icon iconfont">&#xeca1;</span>
-                                        <span class="item-num">1万</span>
+                                        <span class="item-num">{{ item.zan_num }}</span>
                                     </div>
                                 </div>              
                             </div>
@@ -181,14 +188,13 @@ export default {
             dialog: {
                 article: {
                     show: false,
+                    data: {}
                 }
             },
             userInfo: {},
-            article: [
-                {},
-                {},
-                {},
-            ],
+            article: [],
+            recommend: [],
+            comment: [],
         }
     },
     computed: {
@@ -211,10 +217,49 @@ export default {
             sessionStorage.clear()
             this.$router.push({name: 'login'})
         },
+        //文章列表
+        async $_article() {
+            let params = {
+                is_self: 0
+            }
+            let data = await this.$api.home.$_article.call(this,params)
+            if(data !== false) {
+                this.article = data
+            }
+        },
+        //推荐关注
+        async $_recommend() {
+            let data = await this.$api.home.$_recommend.call(this)
+            if(data !== false) {
+                this.recommend = data
+            }
+        },
+        //评论列表
+        async $_comment(id) {
+            let params = {
+                article_id: id
+            }
+            let data = await this.$api.home.$_comment.call(this, params)
+            if(data !== false) {
+                this.comment = data
+            }
+        },
+        //关注
+        async $_follow(id) {
+            let params = {
+                user_id: id
+            }
+            let data = await this.$api.home.$_follow.call(this, params)
+            if(data !== false) {
+                this.$message.success('关注成功')
+            }
+        },
         //打开回复弹出框
-        $_openReply(index) {
-            console.log(index)
+        $_openReply(obj) {
             this.dialog.article.show = true
+            console.log(obj)
+            this.dialog.article.data = obj
+            this.$_comment(obj.article_id)
         },
         //距离现在时间
         $_formatTime(time) {
@@ -242,6 +287,9 @@ export default {
         }
     },
     mounted() {
+        this.$_userInfo()
+        this.$_article()
+        this.$_recommend()
         this.userInfo = this.$store.state.userInfo
     }
 };
@@ -332,6 +380,7 @@ export default {
                 .left {
                     margin-right: 10px;
                     .user-information {
+                        cursor: pointer;
                         width: 288px;
                         height: 230px;
                         background-color: #fff;

@@ -13,6 +13,7 @@
                         </div>
                     </div>
                 </div>
+
                 <div class="ProfileCanopy-navBar">
                     <div class="AppContainer">
                         <div  class="Grid">
@@ -34,7 +35,7 @@
                                         </li>
                                         <li :class="tab === 'followed' ? 'ProfileNav-item is_active' : 'ProfileNav-item'">
                                             <div class="ProfileNav-stat" @click="$_tab('followed')">
-                                                <span class="ProfileNav-label">关注者</span>
+                                                <span class="ProfileNav-label">粉丝</span>
                                                 <span class="ProfileNav-value">{{ userInfo.fans_num || '2' }}</span>
                                             </div>
                                         </li>
@@ -71,36 +72,36 @@
                                          :key="index">
                                         <div class="context">
                                             <div class="content">
-                                                <div  @click="$_openReply(index)">
+                                                <div  @click="$_openReply(article[index])">
                                                     <div class="item-header">
-                                                        <el-image class="the-img" src="" fit="cover">
+                                                        <el-image class="the-img" :src="item.avatar_src" fit="cover">
                                                             <div slot="error" class="image-slot">
                                                                 <i class="el-icon-picture-outline"></i>
                                                             </div>
                                                         </el-image>
-                                                        <strong class="username">name</strong>
+                                                        <strong class="username">{{ item.username }}</strong>
                                                         <i class="el-icon-success success"></i>
-                                                        <span class="time">{{ $_formatTime(1557426567806) }}</span>
+                                                        <span class="time">{{ $_formatTime(item.send_time) }}</span>
                                                     </div>
                                                     <div class="item-text-container">
-                                                        <span>谷歌停止华为合作将对华为造成什么影响谷歌暂停与华为部分合作路透社（Reuters）周日报道称，谷歌已暂停与华为的合作，该业务不属于开源许可范围。这意味着今后华为手机将不能使用Google Play Store、Gmail和YouTube等服务。此外，谷歌还将停止就安卓和谷歌服务为华为提供技术支持和协作。</span>
+                                                        <span>{{ item.body }}</span>
                                                         <div class="picture">
-                                                            <el-image class="the-img" src="" fit="cover"></el-image>
+                                                            <el-image class="the-img" v-if="item.pic_src" :src="item.pic_src" fit="cover"></el-image>
                                                         </div>
                                                     </div>
                                                 </div>
                                                 <div class="action-list">
                                                     <div class="item">
-                                                        <div  @click="$_openReply(index)">
+                                                        <div  @click="$_openReply(item)">
                                                             <i class="el-icon-chat-line-round"></i>
-                                                            <span class="item-num">221</span>
-                                                        </div>
+                                                            <span class="item-num">{{ item.comments_num }}</span>
+                                                        </div>  
                                                     </div>
                                                     <div class="item">
                                                         <span class="icon iconfont">&#xeca1;</span>
-                                                        <span class="item-num">1万</span>
+                                                        <span class="item-num">{{ item.zan }}</span>
                                                     </div>
-                                                    <div class="item" @click="changeVisible(index)">
+                                                    <div class="item" @click="$_deleteArticle(item.article_id)">
                                                         <i class="el-icon-delete"></i>
                                                     </div>
                                                 </div>
@@ -112,12 +113,12 @@
                                 <div class="Grid-cell" v-show="tab === 'following'">
                                     <div class="GridTimeline" style="margin-top:10px">
                                         <div class="Grid">
-                                            <div class="Grid-cell u-mb10">
+                                            <div class="Grid-cell u-mb10" v-for="(item, index) in follow" :key="index">
                                                 <div class="ProfileCard">
                                                     <div class="ProfileCard-bg" style="background-color: #FAB81E"/>
                                                     <div class="ProfileCard-content">
                                                         <div class="ProfileCard-avatarLink">
-                                                            <img class="ProfileCard-avatarImage js-action-profile-avatar" src="https://pbs.twimg.com/profile_images/1134489351709110272/33JDNE7Y_bigger.png" alt=""/>
+                                                            <img class="ProfileCard-avatarImage js-action-profile-avatar" :src="item.avatar_src" alt=""/>
                                                         </div>
                                                         <div class="ProfileCard-actions">
                                                             <div class="u-textLeft">
@@ -127,92 +128,8 @@
                                                             </div>
                                                         </div>
                                                         <div class="ProfileCard-userFields">
-                                                            <div class="ProfileNameTruncated">老夫写代码</div>
-                                                            <p class="ProfileCard-bio">邮箱：xxx@xx.com</p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="Grid-cell u-mb10">
-                                                <div class="ProfileCard">
-                                                    <div class="ProfileCard-bg" style="background-color: #FAB81E"/>
-                                                    <div class="ProfileCard-content">
-                                                        <div class="ProfileCard-avatarLink">
-                                                            <img class="ProfileCard-avatarImage js-action-profile-avatar" src="https://pbs.twimg.com/profile_images/1134489351709110272/33JDNE7Y_bigger.png" alt=""/>
-                                                        </div>
-                                                        <div class="ProfileCard-actions">
-                                                            <div class="u-textLeft">
-                                                                <button type="button" class="following-text">
-                                                                    <span>正在关注</span>
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                        <div class="ProfileCard-userFields">
-                                                            <div class="ProfileNameTruncated">老夫写代码</div>
-                                                            <p class="ProfileCard-bio">邮箱：xxx@xx.com</p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="Grid-cell u-mb10">
-                                                <div class="ProfileCard">
-                                                    <div class="ProfileCard-bg" style="background-color: #FAB81E"/>
-                                                    <div class="ProfileCard-content">
-                                                        <div class="ProfileCard-avatarLink">
-                                                            <img class="ProfileCard-avatarImage js-action-profile-avatar" src="https://pbs.twimg.com/profile_images/1134489351709110272/33JDNE7Y_bigger.png" alt=""/>
-                                                        </div>
-                                                        <div class="ProfileCard-actions">
-                                                            <div class="u-textLeft">
-                                                                <button type="button" class="following-text">
-                                                                    <span>正在关注</span>
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                        <div class="ProfileCard-userFields">
-                                                            <div class="ProfileNameTruncated">老夫写代码</div>
-                                                            <p class="ProfileCard-bio">邮箱：xxx@xx.com</p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="Grid-cell u-mb10">
-                                                <div class="ProfileCard">
-                                                    <div class="ProfileCard-bg" style="background-color: #FAB81E"/>
-                                                    <div class="ProfileCard-content">
-                                                        <div class="ProfileCard-avatarLink">
-                                                            <img class="ProfileCard-avatarImage js-action-profile-avatar" src="https://pbs.twimg.com/profile_images/1134489351709110272/33JDNE7Y_bigger.png" alt=""/>
-                                                        </div>
-                                                        <div class="ProfileCard-actions">
-                                                            <div class="u-textLeft">
-                                                                <button type="button" class="following-text">
-                                                                    <span>正在关注</span>
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                        <div class="ProfileCard-userFields">
-                                                            <div class="ProfileNameTruncated">老夫写代码</div>
-                                                            <p class="ProfileCard-bio">邮箱：xxx@xx.com</p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="Grid-cell u-mb10">
-                                                <div class="ProfileCard">
-                                                    <div class="ProfileCard-bg" style="background-color: #FAB81E"/>
-                                                    <div class="ProfileCard-content">
-                                                        <div class="ProfileCard-avatarLink">
-                                                            <img class="ProfileCard-avatarImage js-action-profile-avatar" src="https://pbs.twimg.com/profile_images/1134489351709110272/33JDNE7Y_bigger.png" alt=""/>
-                                                        </div>
-                                                        <div class="ProfileCard-actions">
-                                                            <div class="u-textLeft">
-                                                                <button type="button" class="following-text">
-                                                                    <span>正在关注</span>
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                        <div class="ProfileCard-userFields">
-                                                            <div class="ProfileNameTruncated">老夫写代码</div>
-                                                            <p class="ProfileCard-bio">邮箱：xxx@xx.com</p>
+                                                            <div class="ProfileNameTruncated">{{ item.username }}</div>
+                                                            <p class="ProfileCard-bio">{{ `邮箱：${item.email}` }}</p>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -223,12 +140,12 @@
                                 <div class="Grid-cell" v-show="tab === 'followed'">
                                     <div class="GridTimeline" style="margin-top:10px">
                                         <div class="Grid">
-                                            <div class="Grid-cell u-mb10">
+                                            <div class="Grid-cell u-mb10"  v-for="(item, index) in fans" :key="index">
                                                 <div class="ProfileCard">
                                                     <div class="ProfileCard-bg" style="background-color: #1CA1F2"/>
                                                     <div class="ProfileCard-content">
                                                         <div class="ProfileCard-avatarLink">
-                                                            <img class="ProfileCard-avatarImage js-action-profile-avatar" src="https://pbs.twimg.com/profile_images/1134489351709110272/33JDNE7Y_bigger.png" alt=""/>
+                                                            <img class="ProfileCard-avatarImage js-action-profile-avatar" :src="item.avatar_src" alt=""/>
                                                         </div>
                                                         <div class="ProfileCard-actions">
                                                             <div class="u-textLeft">
@@ -238,29 +155,8 @@
                                                             </div>
                                                         </div>
                                                         <div class="ProfileCard-userFields">
-                                                            <div class="ProfileNameTruncated">老夫写代码</div>
-                                                            <p class="ProfileCard-bio">邮箱：xxx@xx.com</p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="Grid-cell u-mb10">
-                                                <div class="ProfileCard">
-                                                    <div class="ProfileCard-bg" style="background-color: #80C1F8"/>
-                                                    <div class="ProfileCard-content">
-                                                        <div class="ProfileCard-avatarLink">
-                                                            <img class="ProfileCard-avatarImage js-action-profile-avatar" src="https://pbs.twimg.com/profile_images/1134489351709110272/33JDNE7Y_bigger.png" alt=""/>
-                                                        </div>
-                                                        <div class="ProfileCard-actions">
-                                                            <div class="u-textLeft">
-                                                                <button type="button" class="following-text">
-                                                                    <span>正在关注</span>
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                        <div class="ProfileCard-userFields">
-                                                            <div class="ProfileNameTruncated">老夫写代码</div>
-                                                            <p class="ProfileCard-bio">邮箱：xxx@xx.com</p>
+                                                            <div class="ProfileNameTruncated">{{ item.username }}</div>
+                                                            <p class="ProfileCard-bio">{{ `邮箱：${item.email}` }}</p>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -318,57 +214,57 @@
             <div class="dialog-container">
                 <div class="article-dialog">
                     <div class="item-header">
-                        <el-image class="the-img" src="" fit="cover">
+                        <el-image class="the-img" :src="dialog.article.data.avatar_src" fit="cover">
                             <div slot="error" class="image-slot">
                                 <i class="el-icon-picture-outline"></i>
                             </div>
                         </el-image>
-                        <strong class="username">name</strong>
+                        <strong class="username">{{ dialog.article.data.username }}</strong>
                         <i class="el-icon-success success"></i>
                     </div>
                     <div class="item-text-container">
-                        <span>谷歌停止华为合作将对华为造成什么影响谷歌暂停与华为部分合作路透社（Reuters）周日报道称，谷歌已暂停与华为的合作，该业务不属于开源许可范围。这意味着今后华为手机将不能使用Google Play Store、Gmail和YouTube等服务。此外，谷歌还将停止就安卓和谷歌服务为华为提供技术支持和协作。</span>
+                        <span>{{ dialog.article.data.body }}</span>
                         <div class="picture">
-                            <el-image class="the-img" src="" fit="cover"></el-image>
+                            <el-image class="the-img" v-if="dialog.article.data.pic_src" :src="dialog.article.data.pic_src" fit="cover"></el-image>
                         </div>
-                        <span class="time">{{ $_formatTimeAll(1557426567806) }}</span>
+                        <span class="time">{{ $_formatTimeAll(dialog.article.data.send_time) }}</span>
                     </div>
                     <div class="action-list">
                         <div class="item">
                             <i class="el-icon-chat-line-round"></i>
-                            <span class="item-num">221</span>
+                            <span class="item-num">{{ dialog.article.data.comments_num }}</span>
                         </div>
                         <div class="item">
                             <span class="icon iconfont">&#xeca1;</span>
-                            <span class="item-num">1万</span>
+                            <span class="item-num">{{ dialog.article.data.zan }}</span>
                         </div>
                     </div>
                 </div>
                 <div class="reply"
-                     v-for="(item, index) in article"
+                     v-for="(item, index) in comment"
                      :key="index">
                     <div class="reply-container">
                         <div class="article-dialog">
                             <div class="item-header">
-                                <el-image class="the-img" src="" fit="cover">
+                                <el-image class="the-img" :src="item.avatar_src" fit="cover">
                                     <div slot="error" class="image-slot">
                                         <i class="el-icon-picture-outline"></i>
                                     </div>
                                 </el-image>
-                                <strong class="username">name</strong>
-                                <span class="time">{{ $_formatTime(1557426567806) }}</span>
+                                <strong class="username">{{ item.username }}</strong>
+                                <span class="time">{{ $_formatTime(item.send_time) }}</span>
                             </div>
                             <div class="item-text-container">
-                                <span>as we can</span>
+                                <span>{{ item.body }}</span>
                             </div>
                             <div class="action-list">
                                 <div class="item">
                                     <i class="el-icon-chat-line-round"></i>
-                                    <span class="item-num">221</span>
+                                    <span class="item-num">{{  }}</span>
                                 </div>
                                 <div class="item">
                                     <span class="icon iconfont">&#xeca1;</span>
-                                    <span class="item-num">1万</span>
+                                    <span class="item-num">{{ item.zan_num }}</span>
                                 </div>
                             </div>
                         </div>
@@ -426,20 +322,20 @@
                 bigImageUrl: 'https://pbs.twimg.com/profile_images/993799221559025664/FFcEtWpM_400x400.jpg',
                 imgUrl: 'https://pbs.twimg.com/profile_images/993799221559025664/FFcEtWpM_400x400.jpg',
                 activeTopbar: 'home',
+                comment: [],
                 dialog: {
                     article: {
-                        show: false
+                        show: false,
+                        data: {},
                     },
                     form: {
                         show: false,
                     }
                 },
-                article: [
-                    {},
-                    {},
-                    {}
-                ],
+                article: [],
                 userInfo: {},
+                follow: [],
+                fans: [],
                 notice: [
                     {
                         id: 1,
@@ -507,15 +403,32 @@
             $_updateInfo() {
                 this.dialog.form.show = true;
             },
+            async $_deleteArticle(id) {
+                // console.log(id)
+                let params = {
+                    article_id: id
+                }
+                let data = await this.$api.home.$_deleteArticle.call(this,params)
+                if(data !== false) {
+                    this.$message.success('删除成功')
+                    this.$_article()
+                }
+            },
             $_tab(str) {
                 this.tab = str;
             },
             async $_userInfoChange() {
+                let str = ''
+                let arr = this.form.tags
+                for(let i of arr) {
+                    str += i + ','
+                }
+                str = str.slice(0, -1)
                 let params = {
                     username: this.form.nickname,
                     address: this.form.address,
                     about_me: this.form.motto,
-                    interest: this.form.tags,
+                    interest: str,
                 }
                 let data = await this.$api.home.$_userInfoChange.call(this,params)
                 if(data !== false) {
@@ -523,10 +436,45 @@
                     this.dialog.form.show = false;
                 }
             },
+            async $_comment(id) {
+                let params = {
+                    article_id: id
+                }
+                let data = await this.$api.home.$_comment.call(this, params)
+                if(data !== false) {
+                    // console.log(data)
+                    this.comment = data
+                }
+            },
+            //正在关注
+            async $_getFollowers() {
+                let data = await this.$api.home.$_getFollowers.call(this)
+                if(data !== false) {
+                    // console.log(data)
+                    this.follow = data
+                }
+            },
+            async $_getFans() {
+                let data = await this.$api.home.$_getFans.call(this)
+                if(data !== false) {
+                    this.fans = data
+                }
+            },
+            async $_article() {
+                let params = {
+                    is_self: 1
+                }
+                let data = await this.$api.home.$_article.call(this,params)
+                if(data !== false) {
+                    this.article = data
+                }
+            },
             //打开回复弹出框
-            $_openReply(index) {
-                console.log(index)
+            $_openReply(obj) {
+                // console.log(obj)
                 this.dialog.article.show = true
+                this.dialog.article.data = obj
+                this.$_comment(obj.article_id)
             },
             //距离现在时间
             $_formatTime(time) {
@@ -554,6 +502,9 @@
             }
         },
         mounted() {
+            this.$_article()
+            this.$_getFollowers()
+            this.$_getFans()
             this.userInfo = this.$store.state.userInfo
         }
     }
