@@ -1,63 +1,5 @@
 <template>
     <div class="home">
-        <div class="topbar">
-            <div class="left">
-                <el-tabs v-model="activeTopbar">
-                    <el-tab-pane name="home">
-                        <span slot="label">
-                            <div class="tab-container">
-                                <i class="el-icon-house icon-size"></i>
-                                <span class="word-size">主页</span>
-                            </div>
-                        </span>
-                    </el-tab-pane>
-                    <el-tab-pane name="message">
-                        <span slot="label">
-                            <div class="tab-container">
-                                <i class="el-icon-bell icon-size"></i>
-                                <span class="word-size">消息</span>
-                            </div>
-                        </span>
-                    </el-tab-pane>
-                </el-tabs>
-            </div>
-
-            <div class="middle">
-                <img class="icon" src="../assets/banana.png">
-            </div>
-
-            <div class="right">
-                <el-tooltip effect="dark" content="个人资料与帐号" placement="bottom" >
-                    <el-popover
-                        placement="bottom"
-                        width="200"
-                        trigger="click">
-
-                        <div class="user-popover">
-                            <div class="user-data">
-                                <div class="user-name">老夫写代码</div>
-                                <div class="user-mail">@coderzhj</div>
-                            </div>
-                            <div class="popover-item"><i class="el-icon-user"></i><span>个人信息</span></div>
-                            <div class="popover-item" @click="$_logout"><i class="el-icon-back"></i><span>登出</span></div>
-                        </div>
-                        
-                        <div class="user" slot="reference">
-                            <img src="../assets/van.png">
-                        </div>
-                    </el-popover>
-                </el-tooltip>
-                <el-button style="
-                    margin-left:20px;
-                    font-size: 14px;
-                    font-weight: bold;" 
-                    type="primary"
-                    size="mini"
-                    round>
-                    发推
-                </el-button>
-            </div>
-        </div>
 
         <div class="container">
             <div class="content">
@@ -67,24 +9,23 @@
                     <div class="user-information">
                         <div class="background-picture"></div>
                         <div class="user-icon">
-                            <img src="../assets/van.png">
+                            <img :src="userInfo.avatar_src?userInfo.avatar_src:'../assets/van.png'">
                         </div>
                         <div class="user-data">
-                            <div class="user-name">老夫写代码</div>
-                            <div class="user-mail">@coderzhj</div>
+                            <div class="user-name">{{ userInfo.username || '老夫写代码' }}</div>                        
                         </div>
                         <div class="other-data">
                             <div class="item">
                                 <div class="top">推文</div>
-                                <span>4</span>
+                                <span>{{ userInfo.articles_num || '3' }}</span>
                             </div>
                             <div class="item">
                                 <div class="top">正在关注</div>
-                                <span>8</span>
+                                <span>{{ userInfo.follows_num || '5' }}</span>
                             </div>
                             <div class="item">
                                 <div class="top">关注者</div>
-                                <span>2</span>
+                                <span>{{ userInfo.fans_num || '2' }}</span>
                             </div>
                         </div>
                         
@@ -227,9 +168,13 @@
 </template>
 
 <script>
+    import Header from './header';
 
 export default {
     name: "home",
+    components: {
+        Header
+    },
     data() {
         return {
             activeTopbar: 'home',
@@ -238,10 +183,11 @@ export default {
                     show: false,
                 }
             },
+            userInfo: {},
             article: [
                 {},
                 {},
-                {}
+                {},
             ],
         }
     },
@@ -249,12 +195,17 @@ export default {
 
     },
     methods: {
-        $_authority() {
-            let author_id = sessionStorage.getItem('login')
-            if(author_id) return
-            else {
-                this.$router.push({name: 'login'})
+        $_home() {
+            this.$router.push({name: 'home'})
+        },
+        $_userInfo: async function() {
+            let data = await this.$api.home.$_userInfo.call(this)
+            if(data !== false) {
+                this.userInfo = data
             }
+        },
+        $_info() {
+            this.$router.push({name: 'info'})
         },
         $_logout() {
             sessionStorage.clear()
@@ -291,7 +242,7 @@ export default {
         }
     },
     mounted() {
-        this.$_authority()
+        this.userInfo = this.$store.state.userInfo
     }
 };
 </script>
@@ -439,7 +390,7 @@ export default {
                                 }
                             }
                         }
-                        
+
                     }
                 }
                 .middle {
@@ -467,7 +418,7 @@ export default {
                                         display: absolute;
                                         margin-left: -58px;
                                     }
-                                    
+
                                     .username {
                                         word-break: break-all;
                                         font-weight: bold;
@@ -509,7 +460,7 @@ export default {
                                     };
                                 }
                             }
-                            
+
                         }
                     }
                     .content-end {

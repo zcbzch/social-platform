@@ -4,7 +4,7 @@
             <div class="container">
                 <div class="item"><i class="el-icon-search icon-size"></i>关注你的兴趣所在</div>
                 <div class="item"><i class="el-icon-user icon-size"></i>听听大家在谈论什么</div>
-                <div class="item"><i class="el-icon-chat-round icon-size"></i>加入对话</div>
+                <div class="item"><i class="el-icon-chat-round icon-size"></i>现在就加入ShineMory</div>
             </div>
         </div>
 
@@ -12,7 +12,7 @@
             <div class="container">
                 <div class="top">
                     <img class="icon" src="../assets/banana.png">
-                    <div class="title">看看世界上的新鲜事</div>
+                    <div class="title">看看有什么新鲜事</div>
                 </div>
                 <div class="bottom">
                     <div class="word">现在就加入ShineMory</div>
@@ -28,8 +28,13 @@
             <span slot="title" class="title-size">账号登录</span>
             <div class="login-container">
                 <div class="item">
-                    <div class="prefix">帐号</div>
-                    <el-input placeholder="请输入账号" v-model="dialog.login.data.username" clearable></el-input>
+                    <div class="prefix">角色</div>
+                    <el-radio v-model="dialog.login.data.type" label="user">用户</el-radio>
+                    <el-radio v-model="dialog.login.data.type" label="admin">管理员</el-radio>
+                </div>
+                <div class="item">
+                    <div class="prefix">邮箱</div>
+                    <el-input placeholder="请输入账号" v-model="dialog.login.data.email" clearable></el-input>
                 </div>
                 <div class="item">
                     <div class="prefix">密码</div>
@@ -104,6 +109,7 @@
 </template>
 
 <script>
+import { async } from 'q';
 
 const interestOptions = ['学习', '美食', '新闻', '旅游', '娱乐', '游戏']
 
@@ -115,8 +121,9 @@ export default {
                 login: {
                     show: false,
                     data: {
-                        username: '',
+                        email: '',
                         password: '',
+                        type: 'user'
                     }
                 },
                 register: {
@@ -143,13 +150,18 @@ export default {
                 (this.dialog.register.data.password !== this.dialog.register.rePassword)
         }
     },
+    created(){
+        axios.defaults.headers.common['Content-Type'] = 'application/json;charset=utf-8'
+        axios.defaults.headers.post['Content-Type'] = 'application/json;charset=utf-8';
+    },
     methods: {
         $_openDialogLogin() {
             this.dialog.login = {
                 show: true,
                 data: {
-                    username: '',
+                    email: '',
                     password: '',
+                    type: 'user',
                 }
             }
         },
@@ -170,13 +182,40 @@ export default {
                 checkedInterest: [],
             }
         },
-        $_login: function() {
-            sessionStorage.setItem('login', 'test')
-            this.$router.push({name: 'home'})
+        $_login: async function() {
+            let params = {
+                email: this.dialog.login.data.email,
+                password: this.dialog.login.data.password,
+            }
+            let data = await this.$api.login.$_login.call(this, params)
+            if(data !== false) {
+                sessionStorage.setItem('login', data.username)
+                sessionStorage.setItem('id', data.user_id)
+                sessionStorage.setItem('type', this.dialog.login.data.type)
+                sessionStorage.access_token = data.access_token;
+                axios.defaults.headers.common['Authorization'] = `ShineMory ${data.access_token}`;
+                this.$router.push({name: 'header'})
+            }
         },
-        $_register: function() {
-            console.log(this.dialog.register.data)
-            this.dialog.register.show = false
+        $_register: async function() {
+            let str = ''
+            let arr = this.dialog.register.data.interest
+            for(let i of arr) {
+                str += i + ','
+            }
+            str = str.slice(0, -1)
+            let params = {
+                email: this.dialog.register.data.email,
+                username: this.dialog.register.data.address,
+                password: this.dialog.register.data.password,
+                interest: str,
+            }
+            // console.log(params)
+            let data = await this.$api.login.$_register.call(this, params)
+            if(data !== false) {
+                this.$message.success('注册成功')
+                this.dialog.register.show = false
+            }
         },
         next() {
             if (this.dialog.register.active++ >= 2) 
@@ -194,6 +233,9 @@ export default {
             reg.isIndeterminate = checkedCount > 0 && checkedCount < reg.data.interest.length
         }
     },
+    mounted() {
+
+    }
 }
 </script>
 
@@ -217,6 +259,7 @@ export default {
                 text-align: left;
                 .item {
                     height: 24px;
+                    width: 260px;
                     margin: 48px 0;
                     line-height: 24px;
                     display: flex;
